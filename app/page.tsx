@@ -20,6 +20,7 @@ export default function Home() {
   const [generating, setGenerating] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [provider, setProvider] = useState<'claude' | 'openai'>('claude')
 
   useEffect(() => {
     fetch('/api/palace')
@@ -52,7 +53,7 @@ export default function Home() {
       const res = await fetch('/api/generate-room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: palace.topic, rooms: palace.rooms }),
+        body: JSON.stringify({ topic: palace.topic, rooms: palace.rooms, provider }),
       })
       if (!res.ok) throw new Error('Generation failed')
       const newRoom: Room = await res.json()
@@ -96,6 +97,14 @@ export default function Home() {
           {palace && <span className="text-sm text-gray-500 italic">— {palace.topic}</span>}
         </div>
         <div className="flex items-center gap-3">
+          <select
+            value={provider}
+            onChange={e => setProvider(e.target.value as 'claude' | 'openai')}
+            className="text-sm border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-700"
+          >
+            <option value="claude">Claude</option>
+            <option value="openai">OpenAI</option>
+          </select>
           {error && <span className="text-sm text-red-500">{error}</span>}
           {palace && (
             <button
