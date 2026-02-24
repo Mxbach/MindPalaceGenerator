@@ -1,21 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import { generateId } from '@/lib/palace-utils'
 import { Room } from '@/lib/types'
 
-const anthropic = new Anthropic()
+function buildPrompt(topic: string, rooms: Room[]): string {
+  const existingRoomsText = rooms.length === 0
+    ? 'This is the first room. Place it at gridPosition { "x": 0, "y": 0 } with an empty connections array.'
+    : `Existing rooms:\n${rooms.map(r =>
+        `- "${r.name}" at grid position (${r.gridPosition.x}, ${r.gridPosition.y}) with id "${r.id}"`
+      ).join('\n')}\n\nOccupied positions: ${rooms.map(r => `(${r.gridPosition.x},${r.gridPosition.y})`).join(', ')}\n\nPlace the new room adjacent (up/down/left/right) to an existing room at an unoccupied position. Set connections to the id(s) of directly adjacent rooms.`
 
-export async function POST(req: NextRequest) {
-  try {
-    const { topic, rooms }: { topic: string; rooms: Room[] } = await req.json()
-
-    const existingRoomsText = rooms.length === 0
-      ? 'This is the first room. Place it at gridPosition { "x": 0, "y": 0 } with an empty connections array.'
-      : `Existing rooms:\n${rooms.map(r =>
-          `- "${r.name}" at grid position (${r.gridPosition.x}, ${r.gridPosition.y}) with id "${r.id}"`
-        ).join('\n')}\n\nOccupied positions: ${rooms.map(r => `(${r.gridPosition.x},${r.gridPosition.y})`).join(', ')}\n\nPlace the new room adjacent (up/down/left/right) to an existing room at an unoccupied position. Set connections to the id(s) of directly adjacent rooms.`
-
-    const prompt = `Generate a room for a mind palace themed around "${topic}".
+  return `Generate a room for a mind palace themed around "${topic}".
 ${existingRoomsText}
 
 Requirements:
@@ -37,17 +33,46 @@ Return ONLY valid JSON in this exact format, no explanation:
     }
   ]
 }`
+}
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      system: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.',
-      messages: [{ role: 'user', content: prompt }],
-    })
+async function generateWithClaude(prompt: string): Promise<string> {
+  const anthropic = new Anthropic()
+  const response = await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1024,
+    system: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.',
+    messages: [{ role: 'user', content: prompt }],
+  })
+  return response.content[0].type === 'text' ? response.content[0].text : ''
+}
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+async function generateWithOpenAI(prompt: string): Promise<string> {
+  const openai = new OpenAI()
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.' },
+      { role: 'user', content: prompt },
+    ],
+    max_tokens: 1024,
+  })
+  return response.choices[0].message.content ?? ''
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { topic, rooms, provider = 'claude' }: { topic: string; rooms: Room[]; provider?: string } = await req.json()
+
+    if (provider !== 'claude' && provider !== 'openai') {
+      return NextResponse.json({ error: `Unknown provider: ${provider}` }, { status: 400 })
+    }
+
+    const prompt = buildPrompt(topic, rooms)
+    const text = provider === 'openai'
+      ? await generateWithOpenAI(prompt)
+      : await generateWithClaude(prompt)
+
     const roomData = JSON.parse(text)
-
     const room: Room = {
       ...roomData,
       id: generateId(),
