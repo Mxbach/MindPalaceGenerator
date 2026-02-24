@@ -39,7 +39,7 @@ async function generateWithClaude(prompt: string): Promise<string> {
   const anthropic = new Anthropic()
   const response = await anthropic.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
+    max_tokens: 4096,
     system: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.',
     messages: [{ role: 'user', content: prompt }],
   })
@@ -49,12 +49,12 @@ async function generateWithClaude(prompt: string): Promise<string> {
 async function generateWithOpenAI(prompt: string): Promise<string> {
   const openai = new OpenAI()
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5-mini',
     messages: [
       { role: 'system', content: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.' },
       { role: 'user', content: prompt },
     ],
-    max_tokens: 1024,
+    max_completion_tokens: 4096,
   })
   return response.choices[0].message.content ?? ''
 }
