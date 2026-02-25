@@ -88,28 +88,92 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen bg-stone-50">
       {/* Header */}
-      <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm shrink-0">
-        <div className="flex items-center gap-3">
-          <h1 className="font-bold text-gray-900">Mind Palace</h1>
-          {palace && <span className="text-sm text-gray-500 italic">— {palace.topic}</span>}
+      <header style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 1.5rem',
+        height: '56px',
+        background: 'var(--ink)',
+        borderBottom: '1px solid var(--gold-dim)',
+        flexShrink: 0,
+      }}>
+        {/* Left: sigil + palace name + topic */}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
+          <span style={{
+            fontFamily: 'var(--font-cinzel), serif',
+            fontSize: '15px',
+            fontWeight: '600',
+            letterSpacing: '0.12em',
+            color: 'var(--gold)',
+          }}>
+            ⬡ MIND PALACE
+          </span>
+          {palace && (
+            <>
+              <span style={{ color: 'var(--gold-dim)', margin: '0 0.25rem' }}>—</span>
+              <span style={{
+                fontFamily: 'var(--font-courier), monospace',
+                fontSize: '13px',
+                fontStyle: 'italic',
+                color: 'var(--smoke)',
+              }}>
+                {palace.topic}
+              </span>
+            </>
+          )}
         </div>
-        <div className="flex items-center gap-3">
+
+        {/* Right: provider select + error + generate button */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <select
             value={provider}
             onChange={e => setProvider(e.target.value as 'claude' | 'openai')}
-            className="text-sm border border-gray-200 rounded px-2 py-1.5 bg-white text-gray-700"
+            style={{
+              fontFamily: 'var(--font-courier), monospace',
+              fontSize: '12px',
+              color: 'var(--smoke)',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: '1px solid var(--gold-dim)',
+              outline: 'none',
+              cursor: 'pointer',
+              padding: '2px 4px',
+            }}
           >
-            <option value="claude">Claude</option>
-            <option value="openai">OpenAI</option>
+            <option value="claude" style={{ background: 'var(--ink)' }}>Claude</option>
+            <option value="openai" style={{ background: 'var(--ink)' }}>OpenAI</option>
           </select>
-          {error && <span className="text-sm text-red-500">{error}</span>}
+
+          {error && (
+            <span style={{
+              fontFamily: 'var(--font-courier), monospace',
+              fontSize: '12px',
+              color: '#f87171',
+            }}>
+              {error}
+            </span>
+          )}
+
           {palace && (
             <button
               onClick={handleGenerateRoom}
               disabled={generating}
-              className="bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-sm font-medium px-4 py-1.5 rounded transition-colors"
+              className={generating ? 'animate-breathe' : ''}
+              style={{
+                fontFamily: 'var(--font-cinzel), serif',
+                fontSize: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.1em',
+                color: 'var(--parchment)',
+                background: generating ? 'var(--gold-dim)' : 'var(--ember)',
+                border: 'none',
+                padding: '6px 16px',
+                cursor: generating ? 'not-allowed' : 'pointer',
+                transition: 'background 200ms ease',
+              }}
             >
-              {generating ? 'Generating...' : '+ Room'}
+              {generating ? 'CONJURING...' : '+ ROOM'}
             </button>
           )}
         </div>
