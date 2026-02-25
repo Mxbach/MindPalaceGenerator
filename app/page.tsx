@@ -82,11 +82,28 @@ export default function Home() {
   const selectedObject = selectedRoom?.objects.find(o => o.id === selected?.objectId) ?? null
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center text-gray-400">Loading...</div>
+    return (
+      <div style={{
+        display: 'flex',
+        height: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--void)',
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-courier), monospace',
+          fontSize: '14px',
+          color: 'var(--smoke)',
+          fontStyle: 'italic',
+        }}>
+          consulting the archive...
+        </span>
+      </div>
+    )
   }
 
   return (
-    <div className="flex flex-col h-screen bg-stone-50">
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--void)' }}>
       {/* Header */}
       <header style={{
         display: 'flex',
@@ -182,10 +199,22 @@ export default function Home() {
       {/* Main area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Canvas area */}
-        <div className="flex-1 overflow-auto p-4">
+        <div style={{ flex: 1, overflow: 'auto', padding: '2rem', background: 'var(--void)' }}>
           {palace && palace.rooms.length === 0 && (
-            <div className="flex h-full items-center justify-center text-gray-400 text-sm">
-              Click &quot;+ Room&quot; to generate your first room
+            <div style={{
+              display: 'flex',
+              height: '100%',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-cormorant), Georgia, serif',
+                fontSize: '20px',
+                fontStyle: 'italic',
+                color: 'var(--smoke)',
+              }}>
+                The palace awaits its first room.
+              </span>
             </div>
           )}
           {palace && palace.rooms.length > 0 && (
