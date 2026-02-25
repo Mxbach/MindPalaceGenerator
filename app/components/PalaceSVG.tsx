@@ -71,9 +71,9 @@ export default function PalaceSVG({
         <line
           key={i}
           x1={ln.x1} y1={ln.y1} x2={ln.x2} y2={ln.y2}
-          stroke="var(--gold)"
+          stroke="var(--border)"
           strokeWidth={1}
-          strokeOpacity={0.4}
+          strokeOpacity={0.7}
           className="animate-lineDraw"
           vectorEffect="non-scaling-stroke"
         />
@@ -132,7 +132,7 @@ function RoomGroup({
       <rect
         x={x} y={y}
         width={ROOM_WIDTH} height={ROOM_HEIGHT}
-        fill="var(--parchment)"
+        fill="var(--page)"
         stroke="none"
         onClick={(e) => { e.stopPropagation(); onRoomClick(room.id) }}
         style={{ cursor: 'default' }}
@@ -179,7 +179,7 @@ function WallLines({
   westNeighbor: boolean; eastNeighbor: boolean
 }) {
   const strokeProps = {
-    stroke: 'var(--gold-dim)',
+    stroke: 'var(--border)',
     strokeWidth: 1.5,
     strokeLinecap: 'round' as const,
   }
@@ -227,7 +227,7 @@ function ObjectNode({
   onObjectClick: (roomId: string, objectId: string) => void
 }) {
   const { x, y } = objectToPixel(room, obj)
-  const fill = isSelected ? 'var(--ember)' : (obj.memory ? 'var(--gold)' : 'var(--gold-dim)')
+  const fill = isSelected ? 'var(--ember)' : (obj.memory ? 'var(--gold)' : 'var(--border)')
   const glowColor = isSelected ? 'var(--ember)' : 'var(--gold)'
 
   return (
@@ -244,7 +244,7 @@ function ObjectNode({
         cx={x} cy={y}
         r={OBJ_RADIUS}
         fill={fill}
-        stroke={isSelected ? 'var(--ember)' : 'var(--gold-dim)'}
+        stroke={isSelected ? 'var(--ember)' : 'var(--border)'}
         strokeWidth={1.5}
         filter={isSelected ? `drop-shadow(0 0 8px var(--ember))` : undefined}
       />
