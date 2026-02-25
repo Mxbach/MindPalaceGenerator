@@ -1,34 +1,54 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next'
+import {
+  Cormorant_Garamond,
+  Cinzel,
+  Courier_Prime,
+  Lora,
+} from 'next/font/google'
+import './globals.css'
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const cormorant = Cormorant_Garamond({
+  weight: ['400', '600', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-cormorant',
+})
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const cinzel = Cinzel({
+  weight: ['400', '600'],
+  subsets: ['latin'],
+  variable: '--font-cinzel',
+})
+
+const courierPrime = Courier_Prime({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-courier',
+})
+
+const lora = Lora({
+  weight: ['400', '600'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  variable: '--font-lora',
+})
 
 export const metadata: Metadata = {
   title: 'Mind Palace',
   description: 'AI-powered mind palace generator using the loci method',
-};
+}
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${cormorant.variable} ${cinzel.variable} ${courierPrime.variable} ${lora.variable} antialiased`}
       >
         {children}
       </body>
     </html>
-  );
+  )
 }
