@@ -38,7 +38,7 @@ export default function NewPalaceModal({ onConfirm }: NewPalaceModalProps) {
       `}</style>
 
       <div style={{
-        background: 'var(--parchment)',
+        background: 'var(--page)',
         padding: '3rem 2.5rem',
         width: '100%',
         maxWidth: '480px',
@@ -47,7 +47,7 @@ export default function NewPalaceModal({ onConfirm }: NewPalaceModalProps) {
         {/* Decorative top rule */}
         <div style={{
           borderTop: '2px solid var(--gold)',
-          borderBottom: '1px solid var(--gold-dim)',
+          borderBottom: '1px solid var(--border)',
           height: '5px',
           marginBottom: '2rem',
         }} />
@@ -86,16 +86,16 @@ export default function NewPalaceModal({ onConfirm }: NewPalaceModalProps) {
               fontFamily: 'var(--font-lora), Georgia, serif',
               fontSize: '15px',
               color: 'var(--ash)',
-              background: 'var(--parchment-dark)',
+              background: 'var(--page-deep)',
               border: 'none',
-              borderBottom: '1px solid var(--gold-dim)',
+              borderBottom: '1px solid var(--border)',
               outline: 'none',
               padding: '10px 4px',
               width: '100%',
               transition: 'border-color 150ms ease',
             }}
             onFocus={e => (e.currentTarget.style.borderBottomColor = 'var(--gold)')}
-            onBlur={e => (e.currentTarget.style.borderBottomColor = 'var(--gold-dim)')}
+            onBlur={e => (e.currentTarget.style.borderBottomColor = 'var(--border)')}
           />
           <button
             type="submit"
@@ -105,8 +105,8 @@ export default function NewPalaceModal({ onConfirm }: NewPalaceModalProps) {
               fontSize: '13px',
               fontWeight: '600',
               letterSpacing: '0.12em',
-              color: topic.trim() ? 'var(--parchment)' : 'var(--smoke)',
-              background: topic.trim() ? 'var(--ember)' : 'var(--gold-dim)',
+              color: topic.trim() ? 'var(--page)' : 'var(--smoke)',
+              background: topic.trim() ? 'var(--ember)' : 'var(--border)',
               border: 'none',
               padding: '12px',
               cursor: topic.trim() ? 'pointer' : 'not-allowed',
