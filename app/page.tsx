@@ -1,13 +1,10 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import dynamic from 'next/dynamic'
 import Sidebar from './components/Sidebar'
 import NewPalaceModal from './components/NewPalaceModal'
+import PalaceSVG from './components/PalaceSVG'
 import { Palace, Room } from '@/lib/types'
-
-// Canvas uses browser APIs — load client-side only
-const Canvas = dynamic(() => import('./components/Canvas'), { ssr: false })
 
 interface SelectedItem {
   roomId: string
@@ -128,7 +125,7 @@ export default function Home() {
             </div>
           )}
           {palace && palace.rooms.length > 0 && (
-            <Canvas
+            <PalaceSVG
               palace={palace}
               selectedObjectId={selected?.objectId ?? null}
               onObjectClick={(roomId, objectId) => setSelected({ roomId, objectId })}
