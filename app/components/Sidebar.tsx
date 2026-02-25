@@ -25,8 +25,8 @@ export default function Sidebar({ room, object, onSave, onClose }: SidebarProps)
     <div style={{
       width: '300px',
       flexShrink: 0,
-      background: 'var(--parchment)',
-      borderLeft: '1px solid var(--gold)',
+      background: 'var(--page-deep)',
+      borderLeft: '1px solid var(--border)',
       display: 'flex',
       flexDirection: 'column',
       padding: '1.5rem 1.25rem',
@@ -113,7 +113,7 @@ export default function Sidebar({ room, object, onSave, onClose }: SidebarProps)
           style={{
             flex: 1,
             minHeight: '120px',
-            background: 'var(--parchment-dark)',
+            background: 'var(--page)',
             border: '1px solid transparent',
             outline: 'none',
             padding: '10px 12px',
