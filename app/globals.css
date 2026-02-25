@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --ink:            #0d0a07;
-  --parchment:      #f2e8d5;
-  --parchment-dark: #d9c9a8;
-  --gold:           #c8933a;
-  --gold-dim:       #7a5820;
-  --ember:          #e06420;
-  --ash:            #4a3f2f;
-  --smoke:          #a89070;
-  --void:           #080604;
+  --page:       #f8f1e4;
+  --page-mid:   #ede4d2;
+  --page-deep:  #ddd0b8;
+  --ink:        #1e140a;
+  --ash:        #4a3220;
+  --smoke:      #8a7060;
+  --border:     #c8a86e;
+  --gold:       #b5831e;
+  --ember:      #c84a18;
 }
 
 body {
-  background: var(--void);
-  color: var(--parchment);
+  background: var(--page);
+  color: var(--ink);
   font-family: var(--font-lora), Georgia, serif;
 }
 
