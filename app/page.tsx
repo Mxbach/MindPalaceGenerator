@@ -23,7 +23,7 @@ export default function Home() {
     fetch('/api/palace')
       .then(r => r.json())
       .then(data => {
-        setPalace(Object.keys(data).length > 0 ? data : null)
+        setPalace(Object.keys(data).length > 0 ? { rooms: [], ...data } : null)
         setLoading(false)
       })
       .catch(() => setLoading(false))
@@ -88,7 +88,7 @@ export default function Home() {
         height: '100vh',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--void)',
+        background: 'var(--page)',
       }}>
         <span style={{
           fontFamily: 'var(--font-courier), monospace',
@@ -103,7 +103,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--void)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', background: 'var(--page)' }}>
       {/* Header */}
       <header style={{
         display: 'flex',
@@ -111,8 +111,8 @@ export default function Home() {
         justifyContent: 'space-between',
         padding: '0 1.5rem',
         height: '56px',
-        background: 'var(--ink)',
-        borderBottom: '1px solid var(--gold-dim)',
+        background: 'var(--page-mid)',
+        borderBottom: '1px solid var(--border)',
         flexShrink: 0,
       }}>
         {/* Left: sigil + palace name + topic */}
@@ -128,7 +128,7 @@ export default function Home() {
           </span>
           {palace && (
             <>
-              <span style={{ color: 'var(--gold-dim)', margin: '0 0.25rem' }}>—</span>
+              <span style={{ color: 'var(--border)', margin: '0 0.25rem' }}>—</span>
               <span style={{
                 fontFamily: 'var(--font-courier), monospace',
                 fontSize: '13px',
@@ -152,14 +152,14 @@ export default function Home() {
               color: 'var(--smoke)',
               background: 'transparent',
               border: 'none',
-              borderBottom: '1px solid var(--gold-dim)',
+              borderBottom: '1px solid var(--border)',
               outline: 'none',
               cursor: 'pointer',
               padding: '2px 4px',
             }}
           >
-            <option value="claude" style={{ background: 'var(--ink)' }}>Claude</option>
-            <option value="openai" style={{ background: 'var(--ink)' }}>OpenAI</option>
+            <option value="claude" style={{ background: 'var(--page-mid)' }}>Claude</option>
+            <option value="openai" style={{ background: 'var(--page-mid)' }}>OpenAI</option>
           </select>
 
           {error && (
@@ -182,8 +182,8 @@ export default function Home() {
                 fontSize: '12px',
                 fontWeight: '600',
                 letterSpacing: '0.1em',
-                color: 'var(--parchment)',
-                background: generating ? 'var(--gold-dim)' : 'var(--ember)',
+                color: 'var(--page)',
+                background: generating ? 'var(--border)' : 'var(--ember)',
                 border: 'none',
                 padding: '6px 16px',
                 cursor: generating ? 'not-allowed' : 'pointer',
@@ -199,7 +199,7 @@ export default function Home() {
       {/* Main area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Canvas area */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '2rem', background: 'var(--void)' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '2rem', background: 'var(--page-mid)' }}>
           {palace && palace.rooms.length === 0 && (
             <div style={{
               display: 'flex',
