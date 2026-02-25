@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Sidebar from './components/Sidebar'
 import NewPalaceModal from './components/NewPalaceModal'
 import PalaceSVG from './components/PalaceSVG'
+import SettingsModal from './components/SettingsModal'
 import { Palace, Room } from '@/lib/types'
 
 interface SelectedItem {
@@ -18,6 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [provider, setProvider] = useState<'claude' | 'openai'>('claude')
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     fetch('/api/palace')
@@ -60,6 +62,14 @@ export default function Home() {
     } finally {
       setGenerating(false)
     }
+  }
+
+  function handleSaveSettings(newTopic: string, newProvider: 'claude' | 'openai') {
+    setProvider(newProvider)
+    if (palace && newTopic !== palace.topic) {
+      savePalace({ ...palace, topic: newTopic })
+    }
+    setSettingsOpen(false)
   }
 
   function handleSaveMemory(memory: string) {
@@ -143,24 +153,24 @@ export default function Home() {
 
         {/* Right: provider select + error + generate button */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <select
-            value={provider}
-            onChange={e => setProvider(e.target.value as 'claude' | 'openai')}
+          <button
+            onClick={() => setSettingsOpen(true)}
+            title="Settings"
             style={{
-              fontFamily: 'var(--font-courier), monospace',
-              fontSize: '12px',
-              color: 'var(--smoke)',
-              background: 'transparent',
+              background: 'none',
               border: 'none',
-              borderBottom: '1px solid var(--border)',
-              outline: 'none',
+              fontSize: '18px',
+              color: 'var(--smoke)',
               cursor: 'pointer',
+              lineHeight: 1,
               padding: '2px 4px',
+              transition: 'color 150ms ease',
             }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ash)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--smoke)')}
           >
-            <option value="claude" style={{ background: 'var(--page-mid)' }}>Claude</option>
-            <option value="openai" style={{ background: 'var(--page-mid)' }}>OpenAI</option>
-          </select>
+            ⚙
+          </button>
 
           {error && (
             <span style={{
@@ -239,6 +249,16 @@ export default function Home() {
 
       {/* New palace modal */}
       {!palace && <NewPalaceModal onConfirm={handleCreatePalace} />}
+
+      {/* Settings modal */}
+      {settingsOpen && palace && (
+        <SettingsModal
+          topic={palace.topic}
+          provider={provider}
+          onSave={handleSaveSettings}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </div>
   )
 }
