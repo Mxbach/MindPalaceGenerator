@@ -6,10 +6,10 @@ import { Room } from '@/lib/types'
 
 function buildPrompt(topic: string, rooms: Room[]): string {
   const existingRoomsText = rooms.length === 0
-    ? 'This is the first room. Place it at gridPosition { "x": 0, "y": 0 } with an empty connections array.'
+    ? 'This is the first room (the entry hall). Place it at gridPosition { "x": 0, "y": 0 } with an empty connections array. It has three valid neighbour directions: left { "x": -1, "y": 0 }, right { "x": 1, "y": 0 }, and down { "x": 0, "y": 1 }.'
     : `Existing rooms:\n${rooms.map(r =>
         `- "${r.name}" at grid position (${r.gridPosition.x}, ${r.gridPosition.y}) with id "${r.id}"`
-      ).join('\n')}\n\nOccupied positions: ${rooms.map(r => `(${r.gridPosition.x},${r.gridPosition.y})`).join(', ')}\n\nPlace the new room adjacent (up/down/left/right) to an existing room at an unoccupied position. Set connections to the id(s) of directly adjacent rooms.`
+      ).join('\n')}\n\nOccupied positions: ${rooms.map(r => `(${r.gridPosition.x},${r.gridPosition.y})`).join(', ')}\n\nPlace the new room adjacent (up/down/left/right) to an existing room at an unoccupied position. Set connections to the id(s) of directly adjacent rooms. CONSTRAINT: never place a room at y < 0. That direction is the palace entrance and must remain clear.`
 
   return `Generate a room for a mind palace themed around "${topic}".
 ${existingRoomsText}
