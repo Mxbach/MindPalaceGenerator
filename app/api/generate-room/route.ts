@@ -59,7 +59,7 @@ async function generateWithClaude(prompt: string): Promise<string> {
 async function generateWithOpenAI(prompt: string): Promise<string> {
   const openai = new OpenAI()
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: 'gpt-5-mini',
     messages: [
       { role: 'system', content: 'You output ONLY valid JSON with no explanation, markdown, or code blocks.' },
       { role: 'user', content: prompt },
