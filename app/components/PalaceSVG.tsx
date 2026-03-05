@@ -5,7 +5,7 @@ import {
   roomToPixel, objectToPixel, getCanvasSize, roomsAreConnected,
 } from '@/lib/palace-utils'
 import {
-  ROOM_WIDTH, ROOM_HEIGHT, OBJ_RADIUS, DOOR_SIZE,
+  ROOM_WIDTH, ROOM_HEIGHT, OBJ_RADIUS, DOOR_SIZE, ENTRY_DOT_RADIUS, ENTRY_TOP_MARGIN,
 } from '@/lib/constants'
 
 interface PalaceSVGProps {
@@ -19,7 +19,13 @@ interface PalaceSVGProps {
 export default function PalaceSVG({
   palace, selectedObjectId, onObjectClick, onRoomClick, onDeselect,
 }: PalaceSVGProps) {
-  const { width, height } = getCanvasSize(palace.rooms)
+  const { width, height, minX, minY } = getCanvasSize(palace.rooms)
+
+  // Entry point: dot + line above the first room (always at gridPosition {x:0, y:0})
+  const entryRoom = palace.rooms.find(r => r.gridPosition.x === 0 && r.gridPosition.y === 0) ?? null
+  const entryPixel = entryRoom ? roomToPixel(entryRoom, minX, minY) : null
+  const dotX = entryPixel ? entryPixel.x + ROOM_WIDTH / 2 : width / 2
+  const dotY = CANVAS_PADDING + ENTRY_TOP_MARGIN / 2
 
   // Collect unique connections to draw corridor lines (avoid duplicates)
   const drawnConnections = new Set<string>()
@@ -34,8 +40,8 @@ export default function PalaceSVG({
       const neighbor = palace.rooms.find(r => r.id === connId)
       if (!neighbor) continue
 
-      const { x: ax, y: ay } = roomToPixel(room)
-      const { x: bx, y: by } = roomToPixel(neighbor)
+      const { x: ax, y: ay } = roomToPixel(room, minX, minY)
+      const { x: bx, y: by } = roomToPixel(neighbor, minX, minY)
 
       const dx = neighbor.gridPosition.x - room.gridPosition.x
       const dy = neighbor.gridPosition.y - room.gridPosition.y
@@ -66,6 +72,28 @@ export default function PalaceSVG({
       style={{ display: 'block' }}
       onClick={onDeselect}
     >
+      {/* Entry point — dot and line above the first room */}
+      {entryPixel && (
+        <>
+          <line
+            x1={dotX} y1={dotY + ENTRY_DOT_RADIUS}
+            x2={dotX} y2={entryPixel.y}
+            stroke="var(--border)"
+            strokeWidth={1}
+            strokeOpacity={0.7}
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle
+            cx={dotX} cy={dotY}
+            r={ENTRY_DOT_RADIUS}
+            fill="none"
+            stroke="var(--smoke)"
+            strokeWidth={1.5}
+            strokeDasharray="3 3"
+          />
+        </>
+      )}
+
       {/* Connection corridor lines — drawn beneath rooms */}
       {connectionLines.map((ln, i) => (
         <line
@@ -88,6 +116,8 @@ export default function PalaceSVG({
           selectedObjectId={selectedObjectId}
           onObjectClick={onObjectClick}
           onRoomClick={onRoomClick}
+          minX={minX}
+          minY={minY}
         />
       ))}
     </svg>
@@ -95,15 +125,17 @@ export default function PalaceSVG({
 }
 
 function RoomGroup({
-  room, allRooms, selectedObjectId, onObjectClick, onRoomClick,
+  room, allRooms, selectedObjectId, onObjectClick, onRoomClick, minX, minY,
 }: {
   room: Room
   allRooms: Room[]
   selectedObjectId: string | null
   onObjectClick: (roomId: string, objectId: string) => void
   onRoomClick: (roomId: string) => void
+  minX: number
+  minY: number
 }) {
-  const { x, y } = roomToPixel(room)
+  const { x, y } = roomToPixel(room, minX, minY)
 
   const northNeighbor = allRooms.find(r =>
     roomsAreConnected(room, r) &&
@@ -165,6 +197,8 @@ function RoomGroup({
           obj={obj}
           isSelected={obj.id === selectedObjectId}
           onObjectClick={onObjectClick}
+          minX={minX}
+          minY={minY}
         />
       ))}
     </g>
@@ -219,14 +253,16 @@ function WallLines({
 }
 
 function ObjectNode({
-  room, obj, isSelected, onObjectClick,
+  room, obj, isSelected, onObjectClick, minX, minY,
 }: {
   room: Room
   obj: PalaceObject
   isSelected: boolean
   onObjectClick: (roomId: string, objectId: string) => void
+  minX: number
+  minY: number
 }) {
-  const { x, y } = objectToPixel(room, obj)
+  const { x, y } = objectToPixel(room, obj, minX, minY)
   const fill = isSelected ? 'var(--ember)' : (obj.memory ? 'var(--gold)' : 'var(--border)')
   const glowColor = isSelected ? 'var(--ember)' : 'var(--gold)'
 
