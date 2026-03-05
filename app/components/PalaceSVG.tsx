@@ -14,10 +14,11 @@ interface PalaceSVGProps {
   onObjectClick: (roomId: string, objectId: string) => void
   onRoomClick: (roomId: string) => void
   onDeselect: () => void
+  onExtendRoom?: (roomId: string) => void
 }
 
 export default function PalaceSVG({
-  palace, selectedObjectId, onObjectClick, onRoomClick, onDeselect,
+  palace, selectedObjectId, onObjectClick, onRoomClick, onDeselect, onExtendRoom,
 }: PalaceSVGProps) {
   const { width, height, minX, minY } = getCanvasSize(palace.rooms)
 
@@ -118,6 +119,7 @@ export default function PalaceSVG({
           onRoomClick={onRoomClick}
           minX={minX}
           minY={minY}
+          onExtendRoom={onExtendRoom}
         />
       ))}
     </svg>
@@ -125,7 +127,7 @@ export default function PalaceSVG({
 }
 
 function RoomGroup({
-  room, allRooms, selectedObjectId, onObjectClick, onRoomClick, minX, minY,
+  room, allRooms, selectedObjectId, onObjectClick, onRoomClick, minX, minY, onExtendRoom,
 }: {
   room: Room
   allRooms: Room[]
@@ -134,6 +136,7 @@ function RoomGroup({
   onRoomClick: (roomId: string) => void
   minX: number
   minY: number
+  onExtendRoom?: (roomId: string) => void
 }) {
   const { x, y } = roomToPixel(room, minX, minY)
 
@@ -157,6 +160,11 @@ function RoomGroup({
     r.gridPosition.y === room.gridPosition.y &&
     r.gridPosition.x === room.gridPosition.x + 1
   )
+
+  const hasRoomBelow = allRooms.some(
+    r => r.gridPosition.x === room.gridPosition.x && r.gridPosition.y === room.gridPosition.y + 1
+  )
+  const showExtend = !!onExtendRoom && !hasRoomBelow
 
   return (
     <g className="animate-roomEnter" style={{ transformOrigin: `${x + ROOM_WIDTH / 2}px ${y + ROOM_HEIGHT / 2}px` }}>
@@ -201,6 +209,37 @@ function RoomGroup({
           minY={minY}
         />
       ))}
+
+      {/* Extend branch button */}
+      {showExtend && (
+        <g
+          className="room-extend-btn"
+          style={{ cursor: 'pointer' }}
+          onClick={(e) => { e.stopPropagation(); onExtendRoom!(room.id) }}
+        >
+          <style>{`
+            .room-extend-btn { opacity: 0; transition: opacity 150ms ease; }
+            .room-extend-btn:hover { opacity: 1; }
+          `}</style>
+          <circle
+            cx={x + ROOM_WIDTH / 2}
+            cy={y + ROOM_HEIGHT + 20}
+            r={10}
+            fill="none"
+            stroke="var(--border)"
+            strokeWidth={1.5}
+          />
+          <text
+            x={x + ROOM_WIDTH / 2}
+            y={y + ROOM_HEIGHT + 25}
+            textAnchor="middle"
+            fill="var(--smoke)"
+            style={{ fontSize: '14px', pointerEvents: 'none', userSelect: 'none' }}
+          >
+            +
+          </text>
+        </g>
+      )}
     </g>
   )
 }
