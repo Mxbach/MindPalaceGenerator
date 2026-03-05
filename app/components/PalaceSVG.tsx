@@ -5,7 +5,7 @@ import {
   roomToPixel, objectToPixel, getCanvasSize, roomsAreConnected,
 } from '@/lib/palace-utils'
 import {
-  ROOM_WIDTH, ROOM_HEIGHT, OBJ_RADIUS, DOOR_SIZE, ENTRY_DOT_RADIUS, ENTRY_TOP_MARGIN,
+  ROOM_WIDTH, ROOM_HEIGHT, OBJ_RADIUS, DOOR_SIZE, CANVAS_PADDING, ENTRY_DOT_RADIUS, ENTRY_TOP_MARGIN,
 } from '@/lib/constants'
 
 interface PalaceSVGProps {
