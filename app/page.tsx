@@ -228,13 +228,15 @@ export default function Home() {
             </div>
           )}
           {palace && palace.rooms.length > 0 && (
-            <PalaceSVG
-              palace={palace}
-              selectedObjectId={selected?.objectId ?? null}
-              onObjectClick={(roomId, objectId) => setSelected({ roomId, objectId })}
-              onRoomClick={() => setSelected(null)}
-              onDeselect={() => setSelected(null)}
-            />
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <PalaceSVG
+                palace={palace}
+                selectedObjectId={selected?.objectId ?? null}
+                onObjectClick={(roomId, objectId) => setSelected({ roomId, objectId })}
+                onRoomClick={() => setSelected(null)}
+                onDeselect={() => setSelected(null)}
+              />
+            </div>
           )}
         </div>
 
