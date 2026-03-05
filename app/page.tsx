@@ -18,7 +18,7 @@ export default function Home() {
   const [generating, setGenerating] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [provider, setProvider] = useState<'claude' | 'openai'>('claude')
+  const [provider, setProvider] = useState<'claude' | 'openai'>('openai')
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {

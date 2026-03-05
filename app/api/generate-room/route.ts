@@ -61,7 +61,7 @@ async function generateWithOpenAI(prompt: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { topic, rooms, provider = 'claude' }: { topic: string; rooms: Room[]; provider?: string } = await req.json()
+    const { topic, rooms, provider = 'openai' }: { topic: string; rooms: Room[]; provider?: string } = await req.json()
 
     if (provider !== 'claude' && provider !== 'openai') {
       return NextResponse.json({ error: `Unknown provider: ${provider}` }, { status: 400 })
