@@ -213,19 +213,14 @@ function RoomGroup({
       {/* Extend branch button */}
       {showExtend && (
         <g
-          className="room-extend-btn"
           style={{ cursor: 'pointer' }}
           onClick={(e) => { e.stopPropagation(); onExtendRoom!(room.id) }}
         >
-          <style>{`
-            .room-extend-btn { opacity: 0; transition: opacity 150ms ease; }
-            .room-extend-btn:hover { opacity: 1; }
-          `}</style>
           <circle
             cx={x + ROOM_WIDTH / 2}
             cy={y + ROOM_HEIGHT + 20}
             r={10}
-            fill="none"
+            fill="transparent"
             stroke="var(--border)"
             strokeWidth={1.5}
           />
