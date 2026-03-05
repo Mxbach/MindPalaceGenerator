@@ -212,7 +212,7 @@ export default function Home() {
       {/* Main area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Canvas area */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '2rem', background: 'var(--page-mid)' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '2rem', background: 'var(--page-mid)', position: 'relative' }}>
           {palace && palace.rooms.length === 0 && (
             <div style={{
               display: 'flex',
@@ -230,6 +230,29 @@ export default function Home() {
               </span>
             </div>
           )}
+          {generating && (
+            <div style={{
+              position: 'sticky',
+              top: 0,
+              zIndex: 10,
+              textAlign: 'center',
+              padding: '6px 0',
+              marginBottom: '1rem',
+            }}>
+              <span
+                className="animate-breathe"
+                style={{
+                  fontFamily: 'var(--font-cinzel), serif',
+                  fontSize: '12px',
+                  letterSpacing: '0.15em',
+                  color: 'var(--smoke)',
+                }}
+              >
+                CONJURING...
+              </span>
+            </div>
+          )}
+
           {palace && palace.rooms.length > 0 && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <PalaceSVG
