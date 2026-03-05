@@ -44,7 +44,7 @@ export default function Home() {
     await savePalace({ topic, rooms: [] })
   }
 
-  async function handleGenerateRoom() {
+  async function handleGenerateRoom(parentRoomId?: string) {
     if (!palace) return
     setGenerating(true)
     setError(null)
@@ -52,7 +52,7 @@ export default function Home() {
       const res = await fetch('/api/generate-room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic: palace.topic, rooms: palace.rooms, provider }),
+        body: JSON.stringify({ topic: palace.topic, rooms: palace.rooms, provider, parentRoomId }),
       })
       if (!res.ok) throw new Error('Generation failed')
       const newRoom: Room = await res.json()
@@ -90,6 +90,9 @@ export default function Home() {
 
   const selectedRoom = palace?.rooms.find(r => r.id === selected?.roomId) ?? null
   const selectedObject = selectedRoom?.objects.find(o => o.id === selected?.objectId) ?? null
+
+  const y1RoomCount = palace?.rooms.filter(r => r.gridPosition.y === 1).length ?? 0
+  const autoPhaseComplete = y1RoomCount >= 5
 
   if (loading) {
     return (
@@ -182,9 +185,9 @@ export default function Home() {
             </span>
           )}
 
-          {palace && (
+          {palace && !autoPhaseComplete && (
             <button
-              onClick={handleGenerateRoom}
+              onClick={() => handleGenerateRoom()}
               disabled={generating}
               className={generating ? 'animate-breathe' : ''}
               style={{
@@ -235,6 +238,7 @@ export default function Home() {
                 onObjectClick={(roomId, objectId) => setSelected({ roomId, objectId })}
                 onRoomClick={() => setSelected(null)}
                 onDeselect={() => setSelected(null)}
+                onExtendRoom={generating ? undefined : handleGenerateRoom}
               />
             </div>
           )}
