@@ -8,7 +8,7 @@ import {
   generateId,
 } from '@/lib/palace-utils'
 import { Room, PalaceObject } from '@/lib/types'
-import { ROOM_WIDTH, ROOM_HEIGHT, GUTTER, CANVAS_PADDING, OBJ_RADIUS } from '@/lib/constants'
+import { ROOM_WIDTH, ROOM_HEIGHT, GUTTER, CANVAS_PADDING, OBJ_RADIUS, ENTRY_TOP_MARGIN } from '@/lib/constants'
 
 const makeRoom = (x: number, y: number, overrides: Partial<Room> = {}): Room => ({
   id: 'r1', name: 'Test Room', description: '',
@@ -22,28 +22,41 @@ const makeObj = (rx: number, ry: number): PalaceObject => ({
 })
 
 describe('roomToPixel', () => {
-  test('grid (0,0) maps to canvas padding offset', () => {
-    expect(roomToPixel(makeRoom(0, 0))).toEqual({ x: CANVAS_PADDING, y: CANVAS_PADDING })
+  test('grid (0,0) maps to canvas padding + entry margin offset', () => {
+    expect(roomToPixel(makeRoom(0, 0))).toEqual({
+      x: CANVAS_PADDING,
+      y: CANVAS_PADDING + ENTRY_TOP_MARGIN,
+    })
   })
   test('grid (1,0) offsets x by ROOM_WIDTH + GUTTER', () => {
     expect(roomToPixel(makeRoom(1, 0))).toEqual({
       x: CANVAS_PADDING + ROOM_WIDTH + GUTTER,
-      y: CANVAS_PADDING,
+      y: CANVAS_PADDING + ENTRY_TOP_MARGIN,
     })
   })
   test('grid (0,1) offsets y by ROOM_HEIGHT + GUTTER', () => {
     expect(roomToPixel(makeRoom(0, 1))).toEqual({
       x: CANVAS_PADDING,
-      y: CANVAS_PADDING + ROOM_HEIGHT + GUTTER,
+      y: CANVAS_PADDING + ENTRY_TOP_MARGIN + ROOM_HEIGHT + GUTTER,
     })
+  })
+  test('negative x normalised by minX renders at CANVAS_PADDING', () => {
+    expect(roomToPixel(makeRoom(-1, 0), -1, 0)).toEqual({
+      x: CANVAS_PADDING,
+      y: CANVAS_PADDING + ENTRY_TOP_MARGIN,
+    })
+  })
+  test('negative x without offset renders off-canvas', () => {
+    const { x } = roomToPixel(makeRoom(-1, 0))
+    expect(x).toBeLessThan(0)
   })
 })
 
 describe('objectToPixel', () => {
-  test('center object (0.5, 0.5) maps to center of room', () => {
+  test('center object (0.5, 0.5) maps to centre of room', () => {
     expect(objectToPixel(makeRoom(0, 0), makeObj(0.5, 0.5))).toEqual({
       x: CANVAS_PADDING + ROOM_WIDTH * 0.5,
-      y: CANVAS_PADDING + ROOM_HEIGHT * 0.5,
+      y: CANVAS_PADDING + ENTRY_TOP_MARGIN + ROOM_HEIGHT * 0.5,
     })
   })
 })
@@ -71,7 +84,7 @@ describe('hitTestObject', () => {
 
 describe('hitTestRoom', () => {
   test('click inside room bounds → true', () => {
-    expect(hitTestRoom(CANVAS_PADDING + 10, CANVAS_PADDING + 10, makeRoom(0, 0))).toBe(true)
+    expect(hitTestRoom(CANVAS_PADDING + 10, CANVAS_PADDING + ENTRY_TOP_MARGIN + 10, makeRoom(0, 0))).toBe(true)
   })
   test('click outside room bounds → false', () => {
     expect(hitTestRoom(0, 0, makeRoom(0, 0))).toBe(false)
@@ -80,14 +93,22 @@ describe('hitTestRoom', () => {
 
 describe('getCanvasSize', () => {
   test('single room at (0,0) → minimal canvas', () => {
-    const { width, height } = getCanvasSize([makeRoom(0, 0)])
+    const { width, height, minX, minY } = getCanvasSize([makeRoom(0, 0)])
     expect(width).toBe(CANVAS_PADDING * 2 + ROOM_WIDTH)
-    expect(height).toBe(CANVAS_PADDING * 2 + ROOM_HEIGHT)
+    expect(height).toBe(CANVAS_PADDING * 2 + ENTRY_TOP_MARGIN + ROOM_HEIGHT)
+    expect(minX).toBe(0)
+    expect(minY).toBe(0)
   })
   test('two rooms at (0,0) and (1,0) → wider canvas', () => {
-    const { width, height } = getCanvasSize([makeRoom(0, 0), makeRoom(1, 0)])
+    const { width, height, minX } = getCanvasSize([makeRoom(0, 0), makeRoom(1, 0)])
     expect(width).toBe(CANVAS_PADDING * 2 + ROOM_WIDTH * 2 + GUTTER)
-    expect(height).toBe(CANVAS_PADDING * 2 + ROOM_HEIGHT)
+    expect(height).toBe(CANVAS_PADDING * 2 + ENTRY_TOP_MARGIN + ROOM_HEIGHT)
+    expect(minX).toBe(0)
+  })
+  test('rooms at x=-1, 0, 1 → minX=-1, width spans 3 cells', () => {
+    const { width, minX } = getCanvasSize([makeRoom(-1, 0), makeRoom(0, 0), makeRoom(1, 0)])
+    expect(minX).toBe(-1)
+    expect(width).toBe(CANVAS_PADDING * 2 + ROOM_WIDTH * 3 + GUTTER * 2)
   })
   test('empty rooms → minimum fallback size', () => {
     const { width, height } = getCanvasSize([])
