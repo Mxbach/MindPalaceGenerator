@@ -9,7 +9,7 @@ jest.mock('@anthropic-ai/sdk', () => ({
   default: jest.fn().mockImplementation(() => ({
     messages: {
       create: jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: '{"name":"The Atrium","description":"A grand entrance hall","gridPosition":{"x":0,"y":0},"connections":[],"objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' }],
+        content: [{ type: 'text', text: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' }],
       }),
     },
   })),
@@ -21,7 +21,7 @@ jest.mock('openai', () => ({
     chat: {
       completions: {
         create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: '{"name":"The Atrium","description":"A grand entrance hall","gridPosition":{"x":0,"y":0},"connections":[],"objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' } }],
+          choices: [{ message: { content: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' } }],
         }),
       },
     },
@@ -64,5 +64,12 @@ describe('POST /api/generate-room', () => {
   test('returns 400 for unknown provider', async () => {
     const res = await POST(makeRequest({ topic: 'Ancient Rome', rooms: [], provider: 'gemini' }))
     expect(res.status).toBe(400)
+  })
+
+  test('returns room with server-computed gridPosition and connections', async () => {
+    const res = await POST(makeRequest({ topic: 'Ancient Rome', rooms: [], provider: 'claude' }))
+    const room = await res.json()
+    expect(room.gridPosition).toEqual({ x: 0, y: 0 })
+    expect(room.connections).toEqual([])
   })
 })
