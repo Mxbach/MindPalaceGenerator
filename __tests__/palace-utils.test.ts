@@ -144,3 +144,99 @@ describe('generateId', () => {
     expect(generateId()).not.toBe(generateId())
   })
 })
+
+import { nextRoomPosition, computeConnections } from '@/lib/palace-utils'
+
+function makeRoomWithId(id: string, x: number, y: number, connections: string[] = []): Room {
+  return {
+    id,
+    name: id,
+    description: '',
+    gridPosition: { x, y },
+    connections,
+    objects: [],
+  }
+}
+
+describe('nextRoomPosition', () => {
+  test('returns (0,0) for empty palace', () => {
+    expect(nextRoomPosition([])).toEqual({ x: 0, y: 0 })
+  })
+
+  test('returns (0,1) after entry room only', () => {
+    const rooms = [makeRoomWithId('entry', 0, 0)]
+    expect(nextRoomPosition(rooms)).toEqual({ x: 0, y: 1 })
+  })
+
+  test('returns (-1,1) after first y=1 room', () => {
+    const rooms = [makeRoomWithId('entry', 0, 0), makeRoomWithId('r1', 0, 1)]
+    expect(nextRoomPosition(rooms)).toEqual({ x: -1, y: 1 })
+  })
+
+  test('returns (1,1) after two y=1 rooms', () => {
+    const rooms = [makeRoomWithId('entry', 0, 0), makeRoomWithId('r1', 0, 1), makeRoomWithId('r2', -1, 1)]
+    expect(nextRoomPosition(rooms)).toEqual({ x: 1, y: 1 })
+  })
+
+  test('returns (-2,1) after three y=1 rooms', () => {
+    const rooms = [
+      makeRoomWithId('entry', 0, 0),
+      makeRoomWithId('r1', 0, 1), makeRoomWithId('r2', -1, 1), makeRoomWithId('r3', 1, 1),
+    ]
+    expect(nextRoomPosition(rooms)).toEqual({ x: -2, y: 1 })
+  })
+
+  test('returns (2,1) after four y=1 rooms', () => {
+    const rooms = [
+      makeRoomWithId('entry', 0, 0),
+      makeRoomWithId('r1', 0, 1), makeRoomWithId('r2', -1, 1), makeRoomWithId('r3', 1, 1), makeRoomWithId('r4', -2, 1),
+    ]
+    expect(nextRoomPosition(rooms)).toEqual({ x: 2, y: 1 })
+  })
+
+  test('uses parentRoomId to place below a specific room', () => {
+    const rooms = [
+      makeRoomWithId('entry', 0, 0),
+      makeRoomWithId('r1', 0, 1), makeRoomWithId('r2', -1, 1),
+    ]
+    expect(nextRoomPosition(rooms, 'r2')).toEqual({ x: -1, y: 2 })
+  })
+
+  test('parentRoomId works for deeper rooms', () => {
+    const rooms = [
+      makeRoomWithId('entry', 0, 0),
+      makeRoomWithId('r1', 0, 1),
+      makeRoomWithId('r2', 0, 2),
+    ]
+    expect(nextRoomPosition(rooms, 'r2')).toEqual({ x: 0, y: 3 })
+  })
+})
+
+describe('computeConnections', () => {
+  test('entry room has no connections', () => {
+    expect(computeConnections({ x: 0, y: 0 }, [])).toEqual([])
+  })
+
+  test('y=1 room connects to entry', () => {
+    const rooms = [makeRoomWithId('entry', 0, 0)]
+    expect(computeConnections({ x: 0, y: 1 }, rooms)).toEqual(['entry'])
+  })
+
+  test('y=1 room with no entry returns empty', () => {
+    expect(computeConnections({ x: 0, y: 1 }, [])).toEqual([])
+  })
+
+  test('y=2 room connects to parent at same x', () => {
+    const rooms = [makeRoomWithId('entry', 0, 0), makeRoomWithId('branch', 0, 1)]
+    expect(computeConnections({ x: 0, y: 2 }, rooms)).toEqual(['branch'])
+  })
+
+  test('y=2 room picks correct parent by x', () => {
+    const rooms = [
+      makeRoomWithId('entry', 0, 0),
+      makeRoomWithId('b0', 0, 1),
+      makeRoomWithId('b1', -1, 1),
+    ]
+    expect(computeConnections({ x: -1, y: 2 }, rooms)).toEqual(['b1'])
+  })
+})
