@@ -4,3 +4,5 @@ export const GUTTER = 40         // space between rooms on the grid
 export const CANVAS_PADDING = 40 // padding around the whole palace
 export const OBJ_RADIUS = 8      // radius of object circles on canvas
 export const DOOR_SIZE = 30      // width of the doorway gap in a wall
+export const ENTRY_DOT_RADIUS = 6      // radius of the entry point dot
+export const ENTRY_TOP_MARGIN = 60     // vertical space above first room for entry dot + line
