@@ -230,6 +230,16 @@ describe('OBJECT_SLOTS', () => {
     const keys = OBJECT_SLOTS.map(s => `${s.x},${s.y}`)
     expect(new Set(keys).size).toBe(5)
   })
+
+  test('slot positions match the designed layout', () => {
+    expect(OBJECT_SLOTS).toEqual([
+      { x: 0.22, y: 0.25 },
+      { x: 0.78, y: 0.25 },
+      { x: 0.50, y: 0.52 },
+      { x: 0.22, y: 0.78 },
+      { x: 0.78, y: 0.78 },
+    ])
+  })
 })
 
 describe('computeConnections', () => {
