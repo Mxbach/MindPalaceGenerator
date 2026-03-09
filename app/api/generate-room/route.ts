@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { generateId, nextRoomPosition, computeConnections } from '@/lib/palace-utils'
 import { Room } from '@/lib/types'
+import { OBJECT_SLOTS } from '@/lib/constants'
 
 function buildPrompt(topic: string, rooms: Room[], position: { x: number; y: number }): string {
   const entryRoom = rooms.find(r => r.gridPosition.y === 0)
@@ -29,7 +30,6 @@ ${context}${existingNames}
 Requirements:
 - 3 to 5 vivid, memorable objects per room
 - Each object should be a strong visual anchor for the loci memory method
-- relativePosition x and y are 0.0–1.0 within the room (spread objects out, avoid edges)
 
 Return ONLY valid JSON in this exact format, no explanation:
 {
@@ -38,8 +38,7 @@ Return ONLY valid JSON in this exact format, no explanation:
   "objects": [
     {
       "name": "Object Name",
-      "description": "Vivid sensory description useful as a memory anchor",
-      "relativePosition": { "x": <0.0-1.0>, "y": <0.0-1.0> }
+      "description": "Vivid sensory description useful as a memory anchor"
     }
   ]
 }`
@@ -96,10 +95,11 @@ export async function POST(req: NextRequest) {
       id: generateId(),
       gridPosition: position,
       connections,
-      objects: roomData.objects.map((obj: any) => ({
+      objects: roomData.objects.map((obj: any, i: number) => ({
         ...obj,
         id: generateId(),
         memory: '',
+        relativePosition: OBJECT_SLOTS[i] ?? OBJECT_SLOTS[0],
       })),
     }
 

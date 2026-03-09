@@ -3,13 +3,14 @@
  */
 import { POST } from '@/app/api/generate-room/route'
 import { NextRequest } from 'next/server'
+import { OBJECT_SLOTS } from '@/lib/constants'
 
 jest.mock('@anthropic-ai/sdk', () => ({
   __esModule: true,
   default: jest.fn().mockImplementation(() => ({
     messages: {
       create: jest.fn().mockResolvedValue({
-        content: [{ type: 'text', text: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' }],
+        content: [{ type: 'text', text: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}},{"name":"Statue","description":"A stone guardian","relativePosition":{"x":0.9,"y":0.9}}]}' }],
       }),
     },
   })),
@@ -21,7 +22,7 @@ jest.mock('openai', () => ({
     chat: {
       completions: {
         create: jest.fn().mockResolvedValue({
-          choices: [{ message: { content: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}}]}' } }],
+          choices: [{ message: { content: '{"name":"The Atrium","description":"A grand entrance hall","objects":[{"name":"Fountain","description":"A marble fountain","relativePosition":{"x":0.5,"y":0.5}},{"name":"Statue","description":"A stone guardian","relativePosition":{"x":0.9,"y":0.9}}]}' } }],
         }),
       },
     },
@@ -71,5 +72,12 @@ describe('POST /api/generate-room', () => {
     const room = await res.json()
     expect(room.gridPosition).toEqual({ x: 0, y: 0 })
     expect(room.connections).toEqual([])
+  })
+
+  test('assigns OBJECT_SLOTS positions to objects, ignoring AI positions', async () => {
+    const res = await POST(makeRequest({ topic: 'Ancient Rome', rooms: [], provider: 'claude' }))
+    const room = await res.json()
+    expect(room.objects[0].relativePosition).toEqual(OBJECT_SLOTS[0])
+    expect(room.objects[1].relativePosition).toEqual(OBJECT_SLOTS[1])
   })
 })
