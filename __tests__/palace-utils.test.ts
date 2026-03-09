@@ -8,7 +8,7 @@ import {
   generateId,
 } from '@/lib/palace-utils'
 import { Room, PalaceObject } from '@/lib/types'
-import { ROOM_WIDTH, ROOM_HEIGHT, GUTTER, CANVAS_PADDING, OBJ_RADIUS, ENTRY_TOP_MARGIN } from '@/lib/constants'
+import { ROOM_WIDTH, ROOM_HEIGHT, GUTTER, CANVAS_PADDING, OBJ_RADIUS, ENTRY_TOP_MARGIN, OBJECT_SLOTS } from '@/lib/constants'
 
 const makeRoom = (x: number, y: number, overrides: Partial<Room> = {}): Room => ({
   id: 'r1', name: 'Test Room', description: '',
@@ -209,6 +209,26 @@ describe('nextRoomPosition', () => {
       makeRoomWithId('r2', 0, 2),
     ]
     expect(nextRoomPosition(rooms, 'r2')).toEqual({ x: 0, y: 3 })
+  })
+})
+
+describe('OBJECT_SLOTS', () => {
+  test('has exactly 5 slots', () => {
+    expect(OBJECT_SLOTS).toHaveLength(5)
+  })
+
+  test('all slots are valid RelativePositions (0.0–1.0)', () => {
+    for (const slot of OBJECT_SLOTS) {
+      expect(slot.x).toBeGreaterThanOrEqual(0)
+      expect(slot.x).toBeLessThanOrEqual(1)
+      expect(slot.y).toBeGreaterThanOrEqual(0)
+      expect(slot.y).toBeLessThanOrEqual(1)
+    }
+  })
+
+  test('no two slots share the same x and y', () => {
+    const keys = OBJECT_SLOTS.map(s => `${s.x},${s.y}`)
+    expect(new Set(keys).size).toBe(5)
   })
 })
 
