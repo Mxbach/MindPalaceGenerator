@@ -233,12 +233,17 @@ describe('OBJECT_SLOTS', () => {
 
   test('slot positions match the designed layout', () => {
     expect(OBJECT_SLOTS).toEqual([
-      { x: 0.22, y: 0.25 },
-      { x: 0.78, y: 0.25 },
+      { x: 0.22, y: 0.22 },
+      { x: 0.78, y: 0.30 },
       { x: 0.50, y: 0.52 },
-      { x: 0.22, y: 0.78 },
+      { x: 0.22, y: 0.68 },
       { x: 0.78, y: 0.78 },
     ])
+  })
+
+  test('no two slots share the same y (prevents label row overlap)', () => {
+    const ys = OBJECT_SLOTS.map(s => s.y)
+    expect(new Set(ys).size).toBe(OBJECT_SLOTS.length)
   })
 })
 
